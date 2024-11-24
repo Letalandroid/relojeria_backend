@@ -4,7 +4,7 @@ import { getHome, create_preference, getSucess } from "../controllers/user.contr
 const user = Router();
 
 user.post(`/create-preference`, create_preference);
-user.post(`/`, getHome);
+user.get(`/`, getHome);
 user.get(`/success`, getSucess);
 
 export default user;
