@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pago con MercadoPago</title>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+  </head>
+  <body>
+    <div id="wallet_container"></div>
+
+    <script>
+      // Inicializar MercadoPago
+      const mp = new MercadoPago(
+        "APP_USR-137afc0b-a70b-462a-a747-688916fc8386",
+        {
+          locale: "es-PE",
+        }
+      );
+
+      // Crear el widget de pago
+      mp.bricks().create("wallet", "wallet_container", {
+        initialization: {
+          preferenceId: "<%= preferenceId %>",
+        },
+      });
+    </script>
+  </body>
+</html>

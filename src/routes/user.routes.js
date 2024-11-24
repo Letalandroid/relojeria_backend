@@ -1,6 +1,10 @@
 import { Router } from "express";
-import { getHome } from "../controllers/user.controller.js";
+import { getHome, create_preference, getSucess } from "../controllers/user.controller.js";
 
-const products = Router();
+const user = Router();
 
-products.get(`/`, getHome);
+user.post(`/create-preference`, create_preference);
+user.post(`/`, getHome);
+user.get(`/success`, getSucess);
+
+export default user;
