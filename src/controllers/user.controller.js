@@ -16,13 +16,13 @@ export const getHome = (req, res) => {
             title: "Mi producto",
             quantity: 1,
             currency_id: "PEN",
-            unit_price: 0.5,
+            unit_price: 1.5,
           }
         ],
         back_urls: {
-          success: `http://${HOST}:3000/success`,
-          failure: `http://${HOST}:3000/success`,
-          pending: `http://${HOST}:3000/success`,
+          success: `${HOST}/success`,
+          failure: `${HOST}/failure`,
+          pending: `${HOST}/pending`,
         },
       },
     })
@@ -58,6 +58,25 @@ export const create_preference = (req, res) => {
       res.status(500).send("Error al crear la preferencia:" + error);
     });
 };
+
+export const create_user = (req, res) => {
+  const { nombre, apellidos, tlf, email, pssw } = req.body;
+  console.log(req.body);
+  
+
+  // connection.query(
+  //   "INSERT INTO Usuarios VALUES (?,?,?,?,?)",
+  //   [nombre, apellidos, tlf, email, pssw],
+
+  //   (error, results) => {
+  //     if (error) return res.status(500).json({ status: 500, message: error });
+  //     res.status(200).json({
+  //       status: 200,
+  //       message: 'Usuario creado correctamente'
+  //     });
+  //   }
+  // );
+}
 
 export const getSucess = (req, res) => {
   res.render("success");
