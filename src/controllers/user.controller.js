@@ -1,5 +1,5 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
-import { MERCADOPAGO_API_KEY } from "../config/config.js";
+import { MERCADOPAGO_API_KEY, HOST } from "../config/config.js";
 
 const client = new MercadoPagoConfig({ accessToken: MERCADOPAGO_API_KEY });
 
@@ -16,19 +16,13 @@ export const getHome = (req, res) => {
             title: "Mi producto",
             quantity: 1,
             currency_id: "PEN",
-            unit_price: 75.56,
-          },
-          {
-            title: "Mi producto 2",
-            quantity: 2,
-            currency_id: "PEN",
-            unit_price: 96.56,
-          },
+            unit_price: 0.5,
+          }
         ],
         back_urls: {
-          success: "http://localhost:3000/success",
-          failure: "http://localhost:3000/success",
-          pending: "http://localhost:3000/success",
+          success: `http://${HOST}:3000/success`,
+          failure: `http://${HOST}:3000/success`,
+          pending: `http://${HOST}:3000/success`,
         },
       },
     })

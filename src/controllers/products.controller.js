@@ -1,13 +1,27 @@
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import { MERCADOPAGO_API_KEY } from "../config/config.js";
 import connection from "../config/db.js";
-import { CardToken } from "mercadopago";
 
-export const getProducts = (req, res) => {
+export const getAllProducts = (req, res) => {
   connection.query("SELECT * FROM Productos", (error, results) => {
     if (error) return res.status(500).json({ status: 500, message: error });
     res.status(200).json(results);
   });
+};
+
+export const getAllProductsSimilary = (req, res) => {
+
+  const { genero, marca } = req.body;
+
+  connection.query(
+    "SELECT * FROM Productos WHERE Genero=? OR Marca=?",
+    [genero, marca],
+
+    (error, results) => {
+      if (error) return res.status(500).json({ status: 500, message: error });
+      res.status(200).json(results);
+    }
+  );
 };
 
 export const getForId = (req, res) => {
@@ -28,7 +42,7 @@ export const searchProducts = (req, res) => {
 
   const searchTerm = `%${text_search}%`;
   connection.query(
-    "SELECT * FROM Productos WHERE Nombre LIKE ? OR Descripcion LIKE ?",
+    "SELECT * FROM Productos WHERE Nombre LIKE ? OR Descripcion LIKE ? OR Genero LIKE ?",
     [searchTerm, searchTerm],
     (error, results) => {
       if (error) return res.status(500).json({ status: 500, message: error });
@@ -58,8 +72,8 @@ export const payProduct = async (req, res) => {
     },
   };
 
-  payment.create({ body }).then(
-    console.log,
-    res.status(200).token
-  ).catch(console.log);
+  payment
+    .create({ body })
+    .then(console.log, res.status(200).token)
+    .catch(console.log);
 };
