@@ -1,5 +1,7 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
 import { MERCADOPAGO_API_KEY, HOST } from "../config/config.js";
+import connection from "../config/db.js";
+import { encryptPassword, matchPassword } from "../utils/bcrypt.js";
 
 const client = new MercadoPagoConfig({ accessToken: MERCADOPAGO_API_KEY });
 
@@ -59,23 +61,25 @@ export const create_preference = (req, res) => {
     });
 };
 
-export const create_user = (req, res) => {
+export const create_user = async (req, res) => {
   const { nombre, apellidos, tlf, email, pssw } = req.body;
-  console.log(req.body);
-  
+  const pssw_encrypt = await encryptPassword(pssw);
 
-  // connection.query(
-  //   "INSERT INTO Usuarios VALUES (?,?,?,?,?)",
-  //   [nombre, apellidos, tlf, email, pssw],
+  connection.query(
+    "INSERT INTO Usuarios (Nombre, Apellidos, Telefono, Correo, Password) VALUES (?,?,?,?,?)",
+    [nombre, apellidos, tlf, email, pssw_encrypt],
 
-  //   (error, results) => {
-  //     if (error) return res.status(500).json({ status: 500, message: error });
-  //     res.status(200).json({
-  //       status: 200,
-  //       message: 'Usuario creado correctamente'
-  //     });
-  //   }
-  // );
+    (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ status: 500, message: error });
+      }
+      res.status(200).json({
+        status: 200,
+        message: 'Usuario creado correctamente'
+      });
+    }
+  );
 }
 
 export const getSucess = (req, res) => {

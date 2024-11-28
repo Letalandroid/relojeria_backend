@@ -43,9 +43,12 @@ export const searchProducts = (req, res) => {
   const searchTerm = `%${text_search}%`;
   connection.query(
     "SELECT * FROM Productos WHERE Nombre LIKE ? OR Descripcion LIKE ? OR Genero LIKE ?",
-    [searchTerm, searchTerm],
+    [searchTerm, searchTerm, searchTerm],
     (error, results) => {
-      if (error) return res.status(500).json({ status: 500, message: error });
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ status: 500, message: error });
+      }
       res.status(200).json(results);
     }
   );
