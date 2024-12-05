@@ -3,20 +3,24 @@ import { AUTH_PASS, AUTH_USER } from "../config/config.js";
 
 export const sendPaySuccess = async (prefer_id, email) => {
   const content = `
-        <div>
-            <h1>🎉 Compra realizada correctamente 🎉</h1>
-            <p>La última compra con el ID <b>${prefer_id}</b> se ha realizado correctamente.</p>
-            <b>Gracias por la preferencia ✨</b>
-            <a href="https://wa.me/+51918698741?text=Hola! Quiero consultar sobre mi pedido *${prefer_id}*" style="
+    <div>
+        <h1>🎉 Compra realizada correctamente 🎉</h1>
+        <p>La última compra con el ID <b>${prefer_id}</b> se ha realizado correctamente.</p>
+        <b style="margin-bottom: 50px">Gracias por la preferencia ✨</b>
+        <br/>
+        <p>
+            <a href="https://wa.me/51918698741?text=Hola%21%20Quiero%20consultar%20sobre%20mi%20pedido%20*${prefer_id}*" style="
                 text-decoration: none;
                 color: white;
                 background: #07524B;
                 padding: 15px;
                 border-radius: 10px;
                 font-weight: bold;
+                margin: 20px 0;
             ">Consultar mi pedido</a>
-        </div>
-    `;
+        </p>
+    </div>
+  `;
 
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",

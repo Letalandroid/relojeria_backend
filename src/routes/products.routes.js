@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getForId, getAllProducts, payProduct, searchProducts, getAllProductsSimilary } from "../controllers/products.controller.js";
 import { ROUTER_PATH } from "../config/config.js";
 
+
 const products = Router();
 
 products.get(`${ROUTER_PATH}/products`, getAllProducts);
