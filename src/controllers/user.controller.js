@@ -5,6 +5,7 @@ import { encryptPassword, matchPassword } from "../utils/bcrypt.js";
 import { verify_email } from "../utils/verifyEmail.js";
 import { sendCode } from "../utils/sendCode.js";
 import { generateRandomCode } from "../utils/generateRandomCode.js";
+import { newCodeVerify } from "../utils/newCodeVerify.js";
 
 const client = new MercadoPagoConfig({ accessToken: MERCADOPAGO_API_KEY });
 
@@ -78,7 +79,15 @@ export const create_user = async (req, res) => {
         return res.status(500).json({ status: 500, message: error });
       }
 
-      await sendCode(email, generateRandomCode(4));
+      const code = generateRandomCode(4);
+
+      const isCode = await newCodeVerify(email, code);
+
+      if (isCode) {
+        await sendCode(email, code);
+      } else {
+        console.error('Error al agregar el code');
+      }
 
       res.status(200).json({
         status: 200,

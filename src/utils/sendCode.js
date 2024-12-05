@@ -27,7 +27,7 @@ export const sendCode = async (email, codeGenerate) => {
   });
 
   const mailOptions = {
-    from: AUTH_USER,
+    from: `"AirClock - Verification Code" <${AUTH_USER}>`,
     to: email,
     subject: "Código de verificación",
     html: content,
