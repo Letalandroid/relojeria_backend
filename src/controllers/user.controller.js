@@ -6,6 +6,8 @@ import { verify_email } from "../utils/verifyEmail.js";
 import { sendCode } from "../utils/sendCode.js";
 import { generateRandomCode } from "../utils/generateRandomCode.js";
 import { newCodeVerify } from "../utils/newCodeVerify.js";
+import { sendPayPending } from "../utils/sendPayPending.js";
+import { sendPaySuccess } from "../utils/sendPaySuccess.js";
 
 const client = new MercadoPagoConfig({ accessToken: MERCADOPAGO_API_KEY });
 
@@ -45,7 +47,7 @@ export const getHome = (req, res) => {
 
 export const create_preference = (req, res) => {
   const preference = new Preference(client);
-  const relojes = req.body;
+  const { correo, relojes } = req.body;
 
   preference
     .create({
@@ -56,11 +58,36 @@ export const create_preference = (req, res) => {
           failure: `${HOST}/failure`,
           pending: `${HOST}/pending`,
         },
+        payer: {
+          email: correo,
+        },
       },
     })
-    .then((response) => {
+    .then(async (response) => {
       const preferenceId = response.id;
       console.log(response);
+
+      connection.query(
+        "INSERT INTO Payment (prefer_id,email,date_created,status)" +
+        " VALUES (?,?,?,?)",
+        [preferenceId, correo, response.date_created, 'pending'],
+
+        async (error, results) => {
+          if (error) {
+            console.error(error);
+            return res.status(500).json({ status: 500, message: error });
+          }
+
+          console.log(`Pending payment: ${preferenceId}`);
+        }
+      );
+
+      await sendPayPending(
+        preferenceId,
+        correo,
+        response.date_created,
+        relojes
+      );
 
       res.status(200).json({ preferenceId });
     })
@@ -202,6 +229,38 @@ export const delete_code = async (req, res) => {
   );
 };
 
-export const getSucess = (req, res) => {
+export const getSucess = async (req, res) => {
+  const { preference_id } = req.query;
+
+
+  connection.query(
+    "UPDATE Payment SET status='success' WHERE prefer_id=?",
+    [preference_id],
+
+    async (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ status: 500, message: error });
+      }
+
+      console.log(`Success payment: ${preference_id}`);
+    }
+  );
+
+  connection.query(
+    "SELECT email FROM Payment WHERE prefer_id=?",
+    [preference_id],
+
+    async (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ status: 500, message: error });
+      }
+
+      console.log(`Finish: ${preference_id}`);
+      await sendPaySuccess(preference_id, results[0].email);
+    }
+  );
+
   res.render("success");
 };
