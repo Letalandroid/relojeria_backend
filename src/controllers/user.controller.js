@@ -3,6 +3,8 @@ import { MERCADOPAGO_API_KEY, HOST } from "../config/config.js";
 import connection from "../config/db.js";
 import { encryptPassword, matchPassword } from "../utils/bcrypt.js";
 import { verify_email } from "../utils/verifyEmail.js";
+import { sendCode } from "../utils/sendCode.js";
+import { generateRandomCode } from "../utils/generateRandomCode.js";
 
 const client = new MercadoPagoConfig({ accessToken: MERCADOPAGO_API_KEY });
 
@@ -70,11 +72,14 @@ export const create_user = async (req, res) => {
     "INSERT INTO Usuarios (Nombre, Apellidos, Telefono, Correo, Password) VALUES (?,?,?,?,?)",
     [nombre, apellidos, tlf, email, pssw_encrypt],
 
-    (error, results) => {
+    async (error, results) => {
       if (error) {
         console.error(error);
         return res.status(500).json({ status: 500, message: error });
       }
+
+      await sendCode(email, generateRandomCode(4));
+
       res.status(200).json({
         status: 200,
         message: "Usuario creado correctamente",
