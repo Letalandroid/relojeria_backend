@@ -51,6 +51,11 @@ export const create_preference = (req, res) => {
     .create({
       body: {
         items: relojes,
+        back_urls: {
+          success: `${HOST}/success`,
+          failure: `${HOST}/failure`,
+          pending: `${HOST}/pending`,
+        },
       },
     })
     .then((response) => {
