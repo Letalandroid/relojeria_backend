@@ -86,7 +86,7 @@ export const create_user = async (req, res) => {
       if (isCode) {
         await sendCode(email, code);
       } else {
-        console.error('Error al agregar el code');
+        console.error("Error al agregar el code");
       }
 
       res.status(200).json({
@@ -120,22 +120,31 @@ export const login_user = async (req, res) => {
     console.error("Error en login:", error);
     return res.status(500).json({ message: "Error interno del servidor" }); // Respuesta en caso de error
   }
+};
 
-  // connection.query(
-  //   "INSERT INTO Usuarios (Nombre, Apellidos, Telefono, Correo, Password) VALUES (?,?,?,?,?)",
-  //   [email, pssw_encrypt],
+export const validate_email = async (req, res) => {
+  const { email } = req.body;
 
-  //   (error, results) => {
-  //     if (error) {
-  //       console.error(error);
-  //       return res.status(500).json({ status: 500, message: error });
-  //     }
-  //     res.status(200).json({
-  //       status: 200,
-  //       message: 'Usuario creado correctamente'
-  //     });
-  //   }
-  // );
+  connection.query(
+    "SELECT * FROM VerificationCodes WHERE email=?",
+    [email],
+
+    async (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ status: 500, message: error });
+      }
+
+      if (results.length === 0) {
+        return res.status(200).json({ status: 200, message: 'El correo ya ha sido verificado' });
+      }
+
+      res.status(400).json({
+        status: 400,
+        message: "El correo no ha sido verificado",
+      });
+    }
+  );
 };
 
 export const getSucess = (req, res) => {
