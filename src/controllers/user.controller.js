@@ -136,12 +136,62 @@ export const validate_email = async (req, res) => {
       }
 
       if (results.length === 0) {
-        return res.status(200).json({ status: 200, message: 'El correo ya ha sido verificado' });
+        return res
+          .status(200)
+          .json({ status: 200, message: "El correo ya ha sido verificado" });
       }
 
       res.status(400).json({
         status: 400,
         message: "El correo no ha sido verificado",
+      });
+    }
+  );
+};
+
+export const validate_code = async (req, res) => {
+  const { email, code } = req.body;
+
+  connection.query(
+    "SELECT * FROM VerificationCodes WHERE code=?",
+    [code],
+
+    async (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ status: 500, message: error });
+      }
+
+      if (results.length !== 0) {
+        return res.status(200).json({ status: 200, message: "Código válido" });
+      } else {
+        console.error("Código inválido");
+        res.status(201).json({
+          status: 201,
+          message: "Código inválido",
+        });
+      }
+    }
+  );
+};
+
+export const delete_code = async (req, res) => {
+  const { email, code } = req.body;
+
+  connection.query(
+    "DELETE FROM VerificationCodes WHERE email=? AND code=?",
+    [email, code],
+
+    async (error) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ status: 500, message: error });
+      }
+
+      console.log(`Código ${code} eliminado`);
+      res.status(200).json({
+        status: 200,
+        message: `Código ${code} eliminado`,
       });
     }
   );
