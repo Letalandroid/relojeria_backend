@@ -8,6 +8,7 @@ import { generateRandomCode } from "../utils/generateRandomCode.js";
 import { newCodeVerify } from "../utils/newCodeVerify.js";
 import { sendPayPending } from "../utils/sendPayPending.js";
 import { sendPaySuccess } from "../utils/sendPaySuccess.js";
+import { createFacture } from "../utils/createFacture.js";
 
 const client = new MercadoPagoConfig({ accessToken: MERCADOPAGO_API_KEY });
 
@@ -45,9 +46,10 @@ export const getHome = (req, res) => {
     });
 };
 
-export const create_preference = (req, res) => {
+export const create_preference = async (req, res) => {
   const preference = new Preference(client);
   const { correo, relojes } = req.body;
+  console.log('📄 Preparando factura');
 
   preference
     .create({
@@ -65,28 +67,31 @@ export const create_preference = (req, res) => {
     })
     .then(async (response) => {
       const preferenceId = response.id;
-      console.log(response);
+      const factura = await createFacture(preferenceId, correo, relojes);
+      // console.log(factura);
+      // console.log(response);
 
-      connection.query(
-        "INSERT INTO Payment (prefer_id,email,date_created,status)" +
-        " VALUES (?,?,?,?)",
-        [preferenceId, correo, response.date_created, 'pending'],
+      // connection.query(
+      //   "INSERT INTO Payment (prefer_id,email,date_created,status)" +
+      //   " VALUES (?,?,?,?)",
+      //   [preferenceId, correo, response.date_created, 'pending'],
 
-        async (error, results) => {
-          if (error) {
-            console.error(error);
-            return res.status(500).json({ status: 500, message: error });
-          }
+      //   async (error, results) => {
+      //     if (error) {
+      //       console.error(error);
+      //       return res.status(500).json({ status: 500, message: error });
+      //     }
 
-          console.log(`Pending payment: ${preferenceId}`);
-        }
-      );
+      //     console.log(`Pending payment: ${preferenceId}`);
+      //   }
+      // );
 
       await sendPayPending(
         preferenceId,
-        correo,
+        'carlossoncra@gmail.com',
         response.date_created,
-        relojes
+        relojes,
+        factura.qr
       );
 
       res.status(200).json({ preferenceId });
@@ -233,34 +238,34 @@ export const getSucess = async (req, res) => {
   const { preference_id } = req.query;
 
 
-  connection.query(
-    "UPDATE Payment SET status='success' WHERE prefer_id=?",
-    [preference_id],
+  // connection.query(
+  //   "UPDATE Payment SET status='success' WHERE prefer_id=?",
+  //   [preference_id],
 
-    async (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ status: 500, message: error });
-      }
+  //   async (error, results) => {
+  //     if (error) {
+  //       console.error(error);
+  //       return res.status(500).json({ status: 500, message: error });
+  //     }
 
-      console.log(`Success payment: ${preference_id}`);
-    }
-  );
+  //     console.log(`Success payment: ${preference_id}`);
+  //   }
+  // );
 
-  connection.query(
-    "SELECT email FROM Payment WHERE prefer_id=?",
-    [preference_id],
+  // connection.query(
+  //   "SELECT email FROM Payment WHERE prefer_id=?",
+  //   [preference_id],
 
-    async (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ status: 500, message: error });
-      }
+  //   async (error, results) => {
+  //     if (error) {
+  //       console.error(error);
+  //       return res.status(500).json({ status: 500, message: error });
+  //     }
 
       console.log(`Finish: ${preference_id}`);
-      await sendPaySuccess(preference_id, results[0].email);
-    }
-  );
+      await sendPaySuccess(preference_id, 'carlossoncra@gmail.com');
+  //   }
+  // );
 
   res.render("success");
 };

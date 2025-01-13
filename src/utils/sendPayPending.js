@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { AUTH_PASS, AUTH_USER } from "../config/config.js";
 
-export const sendPayPending = async (prefer_id, email, date_created, prods) => {
+export const sendPayPending = async (prefer_id, email, date_created, prods, url_factura) => {
 
     let productos = '';
     let total = 0;
@@ -35,6 +35,9 @@ export const sendPayPending = async (prefer_id, email, date_created, prods) => {
             <p>
                 <b>Total:</b>
                 <span>S/. ${total}</span>
+            </p>
+            <p>
+                <a href='${url_factura}'>Obtener factura</a>
             </p>
         </div>
     `;
